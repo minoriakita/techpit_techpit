@@ -1,9 +1,7 @@
 package com.akita.techpit.chat.chatbackend.api;
 
 import java.util.stream.Stream;
-
-import javax.activation.DataSource;
-
+import javax.sql.DataSource;
 import org.dbunit.Assertion;
 import org.dbunit.DataSourceDatabaseTester;
 import org.dbunit.IDatabaseTester;
@@ -23,22 +21,22 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ChannelApiTest {
-    @Autowired
-    private MockMvc mockMvc;
 
-    @Autowired
-    private DataSource dataSource;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @ParameterizedTest
-    @MethodSource("createTestProvider")
-    public void createTest(String requestBody, String expectedBody, String dbPath) throws Exception {
+  @Autowired
+  private DataSource dataSource;
 
-      IDatabaseTester databaseTester = new DataSourceDatabaseTester(dataSource);
-      var givenUrl = this.getClass().getResource("/channels/create/" + dbPath + "/given/");
-      databaseTester.setDataSet(new CsvURLDataSet(givenUrl));
-      databaseTester.onSetup();
+  @ParameterizedTest
+  @MethodSource("createTestProvider")
+  public void createTest(String requestBody, String expectedBody, String dbPath) throws Exception {
+    IDatabaseTester databaseTester = new DataSourceDatabaseTester(dataSource);
+    var givenUrl = this.getClass().getResource("/channels/create/" + dbPath + "/given/");
+    databaseTester.setDataSet(new CsvURLDataSet(givenUrl));
+    databaseTester.onSetup();
 
-      mockMvc.perform(
+    mockMvc.perform(
         MockMvcRequestBuilders.post("/channels")
             .content(requestBody)
             .contentType(MediaType.APPLICATION_JSON)
@@ -49,40 +47,84 @@ public class ChannelApiTest {
             result.getResponse().getContentAsString(),
             false));
 
-            var actualDataSet = databaseTester.getConnection().createDataSet();
-            var actualChannelsTable = actualDataSet.getTable("channels");
-            var expectedUri = this.getClass().getResource("/channels/create/" + dbPath + "/expected/");
-            var expectedDataSet = new CsvURLDataSet(expectedUri);
-            var expectedChannelsTable = expectedDataSet.getTable("channels");
-            Assertion.assertEquals(expectedChannelsTable, actualChannelsTable);
+    var actualDataSet = databaseTester.getConnection().createDataSet();
+    var actualChannelsTable = actualDataSet.getTable("channels");
+    var expectedUri = this.getClass().getResource("/channels/create/" + dbPath + "/expected/");
+    var expectedDataSet = new CsvURLDataSet(expectedUri);
+    var expectedChannelsTable = expectedDataSet.getTable("channels");
+    Assertion.assertEquals(expectedChannelsTable, actualChannelsTable);
+  }
 
-      }
-    private static Stream<Arguments> createTestProvider() {
-      return Stream.of(Arguments.arguments(
-        """
-            {
-              "name": "はじめてのチャンネル"
-            }
-            """,
-        """
-            {
-              "id": 1,
-              "name": "はじめてのチャンネル"
-            }
-              """,
-        "no-record"),
-    Arguments.arguments(
-        """
-            {
-              "name": "APIで追加するチャンネル"
-            }
-            """,
-        """
-            {
-              "id": 3,
-              "name": "APIで追加するチャンネル"
-            }
-              """,
-        "multi-record"));
-    }
+  private static Stream<Arguments> createTestProvider() {
+    return Stream.of(
+        Arguments.arguments(
+            """
+                {
+                  "name": "はじめてのチャンネル"
+                }
+                """,
+            """
+                {
+                  "id": 1,
+                  "name": "はじめてのチャンネル"
+                }
+                  """,
+            "no-record"),
+        Arguments.arguments(
+            """
+                {
+                  "name": "APIで追加するチャンネル"
+                }
+                """,
+            """
+                {
+                  "id": 3,
+                  "name": "APIで追加するチャンネル"
+                }
+                  """,
+            "multi-record"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("findAllTestProvider")
+  public void findAllTest(String expectedBody, String dbPath) throws Exception {
+    IDatabaseTester databaseTester = new DataSourceDatabaseTester(dataSource);
+    var givenUrl = this.getClass().getResource("/channels/findAll/" + dbPath + "/given/");
+    databaseTester.setDataSet(new CsvURLDataSet(givenUrl));
+    databaseTester.onSetup();
+
+    mockMvc.perform(
+        MockMvcRequestBuilders.get("/channels")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON_UTF8))
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect((result) -> JSONAssert.assertEquals(
+            expectedBody,
+            result.getResponse().getContentAsString(),
+            false));
+
+    var actualDataSet = databaseTester.getConnection().createDataSet();
+    var actualChannelsTable = actualDataSet.getTable("channels");
+    var expectedUri = this.getClass().getResource("/channels/findAll/" + dbPath + "/given/"); // givenを想定結果として利用
+    var expectedDataSet = new CsvURLDataSet(expectedUri);
+    var expectedChannelsTable = expectedDataSet.getTable("channels");
+    Assertion.assertEquals(expectedChannelsTable, actualChannelsTable);
+  }
+
+  private static Stream<Arguments> findAllTestProvider() {
+    return Stream.of(
+        Arguments.arguments("[]", "no-record"),
+        Arguments.arguments("""
+              [
+                {
+                  "id": 1,
+                  "name": "はじめてのチャンネル"
+                },
+                {
+                  "id": 2,
+                  "name": "2つ目のチャンネル"
+                }
+              ]
+            """, "multi-record"));
+  }
 }
