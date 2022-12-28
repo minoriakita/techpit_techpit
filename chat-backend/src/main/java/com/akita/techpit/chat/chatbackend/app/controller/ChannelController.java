@@ -34,10 +34,9 @@ public class ChannelController {
     return channelService.findAll();
   }
 
-//   @PutMapping("/{id}")
-//   public Channel updade(@PathVariable("id") int id, @RequestBody Channel channel){
-//     channel.setId(id);
-//     return channel;
-    // channelService.updade(channel);
-//   }
+  @PutMapping("/{id}")
+  public Channel updade(@PathVariable("id") int id, @RequestBody Channel channel){
+    channel.setId(id);
+    return channelService.updade(channel);
+  }
 }

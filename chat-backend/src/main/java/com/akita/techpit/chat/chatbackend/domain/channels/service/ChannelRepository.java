@@ -9,4 +9,6 @@ public interface ChannelRepository {
   void insert(Channel channel);
   List<Channel> findAll();  
   Optional<Integer> getMaxId();
+
+  int update(Channel channel);
 }    
