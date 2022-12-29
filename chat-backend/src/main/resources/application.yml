@@ -14,3 +14,9 @@ mybatis:
   mapper-locations: classpath*:mybatis/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+jwt:
+  public:
+    key: classpath:app.key.pub
+  private:
+    key: classpath:app.key
