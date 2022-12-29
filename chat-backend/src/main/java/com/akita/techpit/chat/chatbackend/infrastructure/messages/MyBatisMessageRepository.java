@@ -1,5 +1,8 @@
 package com.akita.techpit.chat.chatbackend.infrastructure.messages;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.akita.techpit.chat.chatbackend.domain.messages.model.Message;
@@ -16,6 +19,11 @@ public class MyBatisMessageRepository implements MessageRepository{
   @Override
   public void insert(Message message) {
     messageMapper.insert(message);
+  }
+
+  @Override
+  public List<Message> find(int channelId, Optional<String> searchWord) {
+    return messageMapper.find(channelId, searchWord);
   }
   
 }

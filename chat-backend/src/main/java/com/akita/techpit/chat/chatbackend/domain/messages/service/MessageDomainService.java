@@ -2,6 +2,8 @@ package com.akita.techpit.chat.chatbackend.domain.messages.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -25,5 +27,9 @@ public class MessageDomainService {
     message.setTimestamp(now);
     messageRepository.insert(message);
     return message;
+  }
+
+  public List<Message> find(int channelId, Optional<String> searchWord) {
+    return messageRepository.find(channelId, searchWord);
   }
 }
