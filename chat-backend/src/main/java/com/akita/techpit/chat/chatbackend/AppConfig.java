@@ -80,6 +80,7 @@ public class AppConfig {
             .csrf(csrf -> csrf.ignoringAntMatchers("/**"))
             // ↓↓↓ ここから追加 s↓↓↓
             .httpBasic(Customizer.withDefaults())
+            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
             // ↑↑↑ ここまで追加 ↑↑↑
         return http.build();

@@ -27,5 +27,5 @@ public class AuthController {
     // public SigninUser signup(@RequestBody SigninUser signinUser) {
     //         authService.addUser(signinUser);
     //     return signinUser;
-  }
-// }
+    // }
+}
