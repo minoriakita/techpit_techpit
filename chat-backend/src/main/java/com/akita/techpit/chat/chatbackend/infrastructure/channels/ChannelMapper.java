@@ -14,4 +14,6 @@ public interface ChannelMapper {
   Optional<Integer> getMaxId();
 
   int update(Channel channel);
+
+  int delete(int id);
 }

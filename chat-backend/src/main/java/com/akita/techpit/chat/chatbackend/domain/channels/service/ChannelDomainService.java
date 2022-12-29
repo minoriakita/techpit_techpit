@@ -33,4 +33,8 @@ public class ChannelDomainService {
     channelRepository.update(channle);
     return channle;
   }
+
+  public void delete(int id){
+    channelRepository.delete(id);
+  }
 }

@@ -43,6 +43,6 @@ public class ChannelController {
 
   @DeleteMapping("/{id}")
   public void delete(@PathVariable("id") int id){
-    // channelService.delete(id);
+    channelService.delete(id);
   }
 }
